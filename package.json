@@ -1,0 +1,36 @@
+{
+  "name": "password-manager",
+  "version": "1.0.0",
+  "description": "MERN project",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sahilhadke/password-manager.git"
+  },
+  "keywords": [
+    "mongodb",
+    "express",
+    "react",
+    "node"
+  ],
+  "author": "Sahil Hadke",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sahilhadke/password-manager/issues"
+  },
+  "homepage": "https://github.com/sahilhadke/password-manager#readme",
+  "dependencies": {
+    "bcrypt": "^5.0.1",
+    "dotenv": "^9.0.2",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongodb": "^3.6.6",
+    "mongoose": "^5.12.9",
+    "validator": "^13.6.0"
+  }
+}
