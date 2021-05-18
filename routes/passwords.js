@@ -8,23 +8,44 @@ const router = express.Router()
 // Get all passwords of the user
 router.get('/passwords/all', auth, async (req, res) => {
     try{
-        const passwords = await Password.find({userId: req.user._id})
-        res.status(200).send(passwords)
+        const passlist = await Password.getPasswordList(req.user._id)
+        const newList = []
+        // Decrypts Data
+        passlist.map( (pass) => {
+            pass.website = Password.decryptData(pass.website, pass.userId)
+            pass.username = Password.decryptData(pass.username, pass.userId)
+            pass.password = Password.decryptData(pass.password, pass.userId)
+
+            const newPass = {
+                _id: pass._id,
+                website: pass.website,
+                username: pass.username,
+                password: pass.password
+            }
+            newList.push(newPass)
+        })
+            res.status(200).send(newList)
     }catch(e){
-        res.status(400).send(e)
+
+        console.log(e)
+        res.status(400).send({success: 0, error: "Something went wrong :("})
     }
     
 })
 
 // Get specific website password of the user
 router.get('/passwords', auth, async (req, res) => {
-    console.log('this ran')
     try{
-        console.log(req.params)
-        const passwords = await Password.find({userId: req.user._id, website: req.query.website})
-        res.status(200).send(passwords)
+        const password = await Password.findOne({_id: req.query._id})
+        const passToSend = {
+            website: Password.decryptData(password.website, password.userId),
+            username: Password.decryptData(password.username, password.userId),
+            password: Password.decryptData(password.password, password.userId)
+        }
+        res.status(200).send(passToSend)
     }catch(e){
-        res.status(400).send(e)
+        console.log(e)
+        res.status(400).send({success: 0, error: "Something went wrong :("})
     }
     
 })
@@ -40,10 +61,10 @@ router.post('/passwords/add', auth, async (req, res) => {
         })
     
         await newPassword.save()
-        res.status(200).send(newPassword)
+        res.status(200).send({success: 1})
     }catch(e){
         console.log(e)
-        res.status(400).send(e)
+        res.status(400).send({success: 0, error: "Something went wrong :("})
     }
 })
 
@@ -61,19 +82,20 @@ router.patch('/passwords/update', auth, async (req, res) => {
     try{
 
         const pass = await Password.findOne({
-            website: req.query.website,
+            _id: req.query._id,
             userId: req.user._id
         })
 
         if(pass){
 
             updates.forEach((update)=>{
+                // no need to encrypt because the middleware will do it
                 pass[update] = req.body[update]
             })
     
             await pass.save()
 
-            res.status(200).send(pass)
+            res.status(200).send({success: 1})
 
         }else{
 
@@ -84,7 +106,7 @@ router.patch('/passwords/update', auth, async (req, res) => {
     }catch(e){
 
         console.log(e)
-        res.status(400).send(e)
+        res.status(400).send({success: 0, error: "Something went wrong :("})
 
     }
 
@@ -99,13 +121,14 @@ router.delete('/passwords', auth, async (req, res) => {
         })
 
         if(!pass){
-            res.status(404).send('pass not found')
+            res.status(404).send({success: 0, error: "Password Not Found!"})
         }else{
             await Password.findByIdAndDelete(pass._id)
-            res.status(200).send(pass)
+            res.status(200).send({success: 1})
         }
     }catch(e){
-        res.status(400).send(e)
+        console.log(e)
+        res.status(400).send({success: 0, error: "Something went wrong :("})
     }
 })
 
@@ -122,24 +145,11 @@ router.delete('/passwords/all', auth, async (req, res) => {
             await Password.deleteMany({
                 userId: req.user._id 
             })
-            res.status(200).send(pass)
+            res.status(200).send({success: 1})
         }
     }catch(e){
-        res.status(400).send(e)
+        res.status(400).send({success: 0, error: "Something went wrong :("})
     }
-})
-
-// Dev (Show all Passwords)
-router.get('/dev/passwords', async (req, res) => {
-    
-    try{
-        const pass = await Password.find({})
-        res.status(200).send(pass)
-    }catch(e){
-        console.log(e)
-        res.status(400).send(e)
-    }
-    
 })
 
 module.exports = router

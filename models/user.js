@@ -48,7 +48,7 @@ userSchema.virtual('passwords', {
     foreignField: 'userId'
 })
 
-// Middleware to encrypt password
+// Middleware to hash password
 userSchema.pre('save', async function(next){
 
     const user = this
@@ -56,7 +56,6 @@ userSchema.pre('save', async function(next){
     // only hash the password if it has been modified (or is new)
     if(user.isModified('password')){
         user.password = await bcrypt.hash(user.password, 8)
-        console.log('password hashed!')
     }
 
     next()
