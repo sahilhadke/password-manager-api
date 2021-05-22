@@ -114,6 +114,9 @@ router.patch('/passwords/update', auth, async (req, res) => {
 
 // Delete Password
 router.delete('/passwords', auth, async (req, res) => {
+
+    console.log(req)
+
     try{
         const pass = await Password.findOne({
             ...req.body,

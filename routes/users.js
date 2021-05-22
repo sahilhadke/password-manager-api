@@ -5,6 +5,13 @@ const express = require('express')
 
 const router = express.Router()
 
+// Test
+router.get('/', async (req, res) => {
+    res.send({
+        success: 1
+    })
+})
+
 // User Register
 router.post('/user/register', async (req, res) => {
     const user = new User(req.body)
@@ -102,6 +109,20 @@ router.post('/user/logout', auth, async (req, res) => {
         res.send({success: 1})
     }catch (e){
         res.status(500).send(e)
+    }
+})
+
+// DEV - Get all users ( no auth )
+// Get Current User Profile
+router.get('/dev/user', async (req, res) => {
+
+    try{
+        const userToSend = await User.find({})
+        res.send(userToSend)
+        
+    }catch(e){
+        console.log(e)
+        res.status(500).send({success: 0, error: "Something went wrong :("})
     }
 })
 
